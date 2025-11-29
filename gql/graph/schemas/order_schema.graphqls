@@ -1,0 +1,30 @@
+# GraphQL schema 
+# Define your types, queries, and mutations here.
+
+type ResponseOrder {  
+  items: Order!
+}
+
+type ResponseOrderList {  
+  items: [Order]!
+  pagination: Pagination!
+}
+
+extend type Query {
+  getOrder(id: Int64!): ResponseOrder!
+  getOrderByUserId(option: QueryOption): ResponseOrderList!
+}
+
+type OrderItem {
+  product_id: Int64!
+  product_name: String!
+  qty: Int!
+  price: Float!
+}
+
+type Order {
+  user_id: Int64!
+  payment_method: String!
+  status: String!
+  order_items: [OrderItem]!
+}
