@@ -75,3 +75,25 @@ func (u *orderRepository) GetOrderList(ctx context.Context, option *commonModels
 	result := query.Find(&Orders)
 	return Orders, result.Error
 }
+
+func (u *orderRepository) GetOrderByUserID(ctx context.Context, userID uint64, option *commonModels.QueryOption) ([]models.Order, error) {
+	db := u.db.WithContext(ctx)
+	var Orders []models.Order
+	var limit int = 10
+	var offset int = 0
+	var order string = "id DESC"
+
+	if option != nil {
+		// Apply pagination if provided
+		limit = option.Limit
+		if option.Order != "" {
+			order = option.Order
+		}
+		offset = (option.Page - 1) * limit
+	}
+
+	query := db.Model(&models.Order{}).Where("user_id = ?", userID).Order(order)
+	query = query.Limit(limit).Offset(offset)
+	result := query.Preload("OrderItems").Find(&Orders)
+	return Orders, result.Error
+}

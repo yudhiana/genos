@@ -11,4 +11,5 @@ type OrderRepository interface {
 	CreateOrder(ctx context.Context, input input.Order) (uint64, error)
 	GetOrder(ctx context.Context, id uint64) (*models.Order, error)
 	GetOrderList(ctx context.Context, option *commonModels.QueryOption) ([]models.Order, error)
+	GetOrderByUserID(ctx context.Context, userID uint64, option *commonModels.QueryOption) ([]models.Order, error)
 }

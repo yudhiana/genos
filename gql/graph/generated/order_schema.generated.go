@@ -27,7 +27,7 @@ type OrderItemResolver interface {
 }
 type QueryResolver interface {
 	GetOrder(ctx context.Context, id int64) (*modelsGen.ResponseOrder, error)
-	GetOrderByUserID(ctx context.Context, option *models1.QueryOption) (*modelsGen.ResponseOrderList, error)
+	GetOrderByUserID(ctx context.Context, id int64, option *models1.QueryOption) (*modelsGen.ResponseOrderList, error)
 }
 
 // endregion ************************** generated!.gotpl **************************
@@ -48,11 +48,16 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 func (ec *executionContext) field_Query_getOrderByUserId_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "option", ec.unmarshalOQueryOption2ᚖgenosᚋinternalᚋcommonᚋmodelsᚐQueryOption)
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNInt642int64)
 	if err != nil {
 		return nil, err
 	}
-	args["option"] = arg0
+	args["id"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "option", ec.unmarshalOQueryOption2ᚖgenosᚋinternalᚋcommonᚋmodelsᚐQueryOption)
+	if err != nil {
+		return nil, err
+	}
+	args["option"] = arg1
 	return args, nil
 }
 
@@ -370,7 +375,7 @@ func (ec *executionContext) _Query_getOrderByUserId(ctx context.Context, field g
 		ec.fieldContext_Query_getOrderByUserId,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.resolvers.Query().GetOrderByUserID(ctx, fc.Args["option"].(*models1.QueryOption))
+			return ec.resolvers.Query().GetOrderByUserID(ctx, fc.Args["id"].(int64), fc.Args["option"].(*models1.QueryOption))
 		},
 		nil,
 		ec.marshalNResponseOrderList2ᚖgenosᚋgqlᚋgraphᚋmodels_genᚐResponseOrderList,

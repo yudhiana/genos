@@ -67,7 +67,7 @@ type ComplexityRoot struct {
 
 	Query struct {
 		GetOrder         func(childComplexity int, id int64) int
-		GetOrderByUserID func(childComplexity int, option *models.QueryOption) int
+		GetOrderByUserID func(childComplexity int, id int64, option *models.QueryOption) int
 	}
 
 	ResponseOrder struct {
@@ -219,7 +219,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Query.GetOrderByUserID(childComplexity, args["option"].(*models.QueryOption)), true
+		return e.complexity.Query.GetOrderByUserID(childComplexity, args["id"].(int64), args["option"].(*models.QueryOption)), true
 
 	case "ResponseOrder.items":
 		if e.complexity.ResponseOrder.Items == nil {
@@ -384,7 +384,7 @@ type ResponseOrderList {
 
 extend type Query {
   getOrder(id: Int64!): ResponseOrder!
-  getOrderByUserId(option: QueryOption): ResponseOrderList!
+  getOrderByUserId(id: Int64!, option: QueryOption): ResponseOrderList!
 }
 
 type OrderItem {

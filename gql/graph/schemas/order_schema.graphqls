@@ -12,7 +12,7 @@ type ResponseOrderList {
 
 extend type Query {
   getOrder(id: Int64!): ResponseOrder!
-  getOrderByUserId(option: QueryOption): ResponseOrderList!
+  getOrderByUserId(id: Int64!, option: QueryOption): ResponseOrderList!
 }
 
 type OrderItem {

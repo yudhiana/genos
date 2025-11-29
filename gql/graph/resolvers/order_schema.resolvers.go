@@ -48,14 +48,14 @@ func (r *queryResolver) GetOrder(ctx context.Context, id int64) (*modelsGen.Resp
 }
 
 // GetOrderByUserID is the resolver for the getOrderByUserId field.
-func (r *queryResolver) GetOrderByUserID(ctx context.Context, option *models1.QueryOption) (*modelsGen.ResponseOrderList, error) {
+func (r *queryResolver) GetOrderByUserID(ctx context.Context, id int64, option *models1.QueryOption) (*modelsGen.ResponseOrderList, error) {
 	uc := usecase.NewOrderUsecase(db.GetDatabaseConnection(), repository.NewOrderRepository(db.GetDatabaseConnection()))
-	orderList, err := uc.GetOrderList(ctx, option)
+	orderList, err := uc.GetOrderByUserID(ctx, uint64(id), option)
 	if err != nil {
 		return nil, err
 	}
 
-	orderItems := make([]*models.Order, len(orderList), 0)
+	orderItems := make([]*models.Order, len(orderList))
 	for i := range orderList {
 		orderItems[i] = &orderList[i]
 	}
@@ -78,22 +78,3 @@ func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
 type orderResolver struct{ *Resolver }
 type orderItemResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-/*
-	func (r *orderResolver) Items(ctx context.Context, obj *models.Order) ([]*models.OrderItem, error) {
-	if obj != nil {
-		orderItems := make([]*models.OrderItem, len(obj.OrderItems), 0)
-		for i := range obj.OrderItems {
-			orderItems[i] = &obj.OrderItems[i]
-		}
-		return orderItems, nil
-	}
-	return nil, nil
-}
-*/

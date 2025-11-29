@@ -48,3 +48,12 @@ func (uc *orderUsecase) GetOrderList(ctx context.Context, option *commonModels.Q
 
 	return orderList, nil
 }
+
+func (uc *orderUsecase) GetOrderByUserID(ctx context.Context, userID uint64, option *commonModels.QueryOption) ([]models.Order, error) {
+	orderList, err := uc.repo.GetOrderByUserID(ctx, userID, option)
+	if err != nil {
+		return nil, err
+	}
+
+	return orderList, nil
+}
