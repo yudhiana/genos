@@ -20,10 +20,10 @@ exec:
   # worker_limit: 1000
 
 # Uncomment to enable federation
-# federation:
-#   filename: graph/federation.go
-#   package: graph
-#   version: 2
+federation:
+  filename: graph/generated/federation.go
+  package: generated
+  version: 2
 #   options:
 #     computed_requires: true
 
@@ -152,10 +152,6 @@ models:
   # integers, or ignore the spec and bind Int to graphql.Int / graphql.Int64
   # (the default behavior of gqlgen). This is fine in simple use cases when you
   # do not need to worry about interoperability and only expect small numbers.
-  Float:
-    model:
-      - genos/gql/graph/scalars.Float32
-      - genos/gql/graph/scalars.Float64
   Int:
     model:
       - github.com/99designs/gqlgen/graphql.Int
@@ -178,9 +174,3 @@ models:
   Pagination:
     model:
       - genos/internal/common/models.Pagination
-  Order:
-    model:
-      - genos/modules/orders/models.Order
-  OrderItem:
-    model:
-      - genos/modules/orders/models.OrderItem

@@ -1,6 +1,7 @@
 # GraphQL schema 
 # Define your types, queries, and mutations here.
 
+
 type ResponseOrder {  
   items: Order!
 }
@@ -15,16 +16,29 @@ extend type Query {
   getOrderByUserId(id: Int64!, option: QueryOption): ResponseOrderList!
 }
 
+type Order @key(fields: "id") {
+  id: Int64!
+  user_id: Int64!
+  order_number: String!
+  total_amount: Float!
+  payment_method: String!
+  status: String!
+  created_at: Time!
+  updated_at: Time!
+  deleted_at: Time
+  order_items: [OrderItem!]!
+}
+
 type OrderItem {
+  id: Int64!
+  order_id: Int64!
   product_id: Int64!
   product_name: String!
   qty: Int!
   price: Float!
 }
 
-type Order {
-  user_id: Int64!
-  payment_method: String!
-  status: String!
-  order_items: [OrderItem]!
+extend type User @key(fields: "id") {
+  id: Int64! @external
+  orders: [Order!]!
 }

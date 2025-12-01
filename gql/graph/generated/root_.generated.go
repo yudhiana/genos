@@ -33,8 +33,7 @@ type Config struct {
 }
 
 type ResolverRoot interface {
-	Order() OrderResolver
-	OrderItem() OrderItemResolver
+	Entity() EntityResolver
 	Query() QueryResolver
 }
 
@@ -42,14 +41,27 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	Entity struct {
+		FindOrderByID func(childComplexity int, id int64) int
+		FindUserByID  func(childComplexity int, id int64) int
+	}
+
 	Order struct {
+		CreatedAt     func(childComplexity int) int
+		DeletedAt     func(childComplexity int) int
+		ID            func(childComplexity int) int
 		OrderItems    func(childComplexity int) int
+		OrderNumber   func(childComplexity int) int
 		PaymentMethod func(childComplexity int) int
 		Status        func(childComplexity int) int
+		TotalAmount   func(childComplexity int) int
+		UpdatedAt     func(childComplexity int) int
 		UserID        func(childComplexity int) int
 	}
 
 	OrderItem struct {
+		ID          func(childComplexity int) int
+		OrderID     func(childComplexity int) int
 		Price       func(childComplexity int) int
 		ProductID   func(childComplexity int) int
 		ProductName func(childComplexity int) int
@@ -66,8 +78,10 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		GetOrder         func(childComplexity int, id int64) int
-		GetOrderByUserID func(childComplexity int, id int64, option *models.QueryOption) int
+		GetOrder           func(childComplexity int, id int64) int
+		GetOrderByUserID   func(childComplexity int, id int64, option *models.QueryOption) int
+		__resolve__service func(childComplexity int) int
+		__resolve_entities func(childComplexity int, representations []map[string]any) int
 	}
 
 	ResponseOrder struct {
@@ -77,6 +91,15 @@ type ComplexityRoot struct {
 	ResponseOrderList struct {
 		Items      func(childComplexity int) int
 		Pagination func(childComplexity int) int
+	}
+
+	User struct {
+		ID     func(childComplexity int) int
+		Orders func(childComplexity int) int
+	}
+
+	_Service struct {
+		SDL func(childComplexity int) int
 	}
 }
 
@@ -99,12 +122,64 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	_ = ec
 	switch typeName + "." + field {
 
+	case "Entity.findOrderByID":
+		if e.complexity.Entity.FindOrderByID == nil {
+			break
+		}
+
+		args, err := ec.field_Entity_findOrderByID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Entity.FindOrderByID(childComplexity, args["id"].(int64)), true
+
+	case "Entity.findUserByID":
+		if e.complexity.Entity.FindUserByID == nil {
+			break
+		}
+
+		args, err := ec.field_Entity_findUserByID_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Entity.FindUserByID(childComplexity, args["id"].(int64)), true
+
+	case "Order.created_at":
+		if e.complexity.Order.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.Order.CreatedAt(childComplexity), true
+
+	case "Order.deleted_at":
+		if e.complexity.Order.DeletedAt == nil {
+			break
+		}
+
+		return e.complexity.Order.DeletedAt(childComplexity), true
+
+	case "Order.id":
+		if e.complexity.Order.ID == nil {
+			break
+		}
+
+		return e.complexity.Order.ID(childComplexity), true
+
 	case "Order.order_items":
 		if e.complexity.Order.OrderItems == nil {
 			break
 		}
 
 		return e.complexity.Order.OrderItems(childComplexity), true
+
+	case "Order.order_number":
+		if e.complexity.Order.OrderNumber == nil {
+			break
+		}
+
+		return e.complexity.Order.OrderNumber(childComplexity), true
 
 	case "Order.payment_method":
 		if e.complexity.Order.PaymentMethod == nil {
@@ -120,12 +195,40 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Order.Status(childComplexity), true
 
+	case "Order.total_amount":
+		if e.complexity.Order.TotalAmount == nil {
+			break
+		}
+
+		return e.complexity.Order.TotalAmount(childComplexity), true
+
+	case "Order.updated_at":
+		if e.complexity.Order.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.Order.UpdatedAt(childComplexity), true
+
 	case "Order.user_id":
 		if e.complexity.Order.UserID == nil {
 			break
 		}
 
 		return e.complexity.Order.UserID(childComplexity), true
+
+	case "OrderItem.id":
+		if e.complexity.OrderItem.ID == nil {
+			break
+		}
+
+		return e.complexity.OrderItem.ID(childComplexity), true
+
+	case "OrderItem.order_id":
+		if e.complexity.OrderItem.OrderID == nil {
+			break
+		}
+
+		return e.complexity.OrderItem.OrderID(childComplexity), true
 
 	case "OrderItem.price":
 		if e.complexity.OrderItem.Price == nil {
@@ -221,6 +324,25 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Query.GetOrderByUserID(childComplexity, args["id"].(int64), args["option"].(*models.QueryOption)), true
 
+	case "Query._service":
+		if e.complexity.Query.__resolve__service == nil {
+			break
+		}
+
+		return e.complexity.Query.__resolve__service(childComplexity), true
+
+	case "Query._entities":
+		if e.complexity.Query.__resolve_entities == nil {
+			break
+		}
+
+		args, err := ec.field_Query__entities_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.__resolve_entities(childComplexity, args["representations"].([]map[string]any)), true
+
 	case "ResponseOrder.items":
 		if e.complexity.ResponseOrder.Items == nil {
 			break
@@ -241,6 +363,27 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.ResponseOrderList.Pagination(childComplexity), true
+
+	case "User.id":
+		if e.complexity.User.ID == nil {
+			break
+		}
+
+		return e.complexity.User.ID(childComplexity), true
+
+	case "User.orders":
+		if e.complexity.User.Orders == nil {
+			break
+		}
+
+		return e.complexity.User.Orders(childComplexity), true
+
+	case "_Service.sdl":
+		if e.complexity._Service.SDL == nil {
+			break
+		}
+
+		return e.complexity._Service.SDL(childComplexity), true
 
 	}
 	return 0, false
@@ -373,6 +516,7 @@ type Pagination {
 	{Name: "../schemas/order_schema.graphqls", Input: `# GraphQL schema 
 # Define your types, queries, and mutations here.
 
+
 type ResponseOrder {  
   items: Order!
 }
@@ -387,19 +531,101 @@ extend type Query {
   getOrderByUserId(id: Int64!, option: QueryOption): ResponseOrderList!
 }
 
+type Order @key(fields: "id") {
+  id: Int64!
+  user_id: Int64!
+  order_number: String!
+  total_amount: Float!
+  payment_method: String!
+  status: String!
+  created_at: Time!
+  updated_at: Time!
+  deleted_at: Time
+  order_items: [OrderItem!]!
+}
+
 type OrderItem {
+  id: Int64!
+  order_id: Int64!
   product_id: Int64!
   product_name: String!
   qty: Int!
   price: Float!
 }
 
-type Order {
-  user_id: Int64!
-  payment_method: String!
-  status: String!
-  order_items: [OrderItem]!
+extend type User @key(fields: "id") {
+  id: Int64! @external
+  orders: [Order!]!
+}`, BuiltIn: false},
+	{Name: "../../federation/directives.graphql", Input: `
+	directive @authenticated on FIELD_DEFINITION | OBJECT | INTERFACE | SCALAR | ENUM
+	directive @composeDirective(name: String!) repeatable on SCHEMA
+	directive @extends on OBJECT | INTERFACE
+	directive @external on OBJECT | FIELD_DEFINITION
+	directive @key(fields: FieldSet!, resolvable: Boolean = true) repeatable on OBJECT | INTERFACE
+	directive @inaccessible on
+	  | ARGUMENT_DEFINITION
+	  | ENUM
+	  | ENUM_VALUE
+	  | FIELD_DEFINITION
+	  | INPUT_FIELD_DEFINITION
+	  | INPUT_OBJECT
+	  | INTERFACE
+	  | OBJECT
+	  | SCALAR
+	  | UNION
+	directive @interfaceObject on OBJECT
+	directive @link(import: [String!], url: String!) repeatable on SCHEMA
+	directive @override(from: String!, label: String) on FIELD_DEFINITION
+	directive @policy(policies: [[federation__Policy!]!]!) on
+	  | FIELD_DEFINITION
+	  | OBJECT
+	  | INTERFACE
+	  | SCALAR
+	  | ENUM
+	directive @provides(fields: FieldSet!) on FIELD_DEFINITION
+	directive @requires(fields: FieldSet!) on FIELD_DEFINITION
+	directive @requiresScopes(scopes: [[federation__Scope!]!]!) on
+	  | FIELD_DEFINITION
+	  | OBJECT
+	  | INTERFACE
+	  | SCALAR
+	  | ENUM
+	directive @shareable repeatable on FIELD_DEFINITION | OBJECT
+	directive @tag(name: String!) repeatable on
+	  | ARGUMENT_DEFINITION
+	  | ENUM
+	  | ENUM_VALUE
+	  | FIELD_DEFINITION
+	  | INPUT_FIELD_DEFINITION
+	  | INPUT_OBJECT
+	  | INTERFACE
+	  | OBJECT
+	  | SCALAR
+	  | UNION
+	scalar _Any
+	scalar FieldSet
+	scalar federation__Policy
+	scalar federation__Scope
+`, BuiltIn: true},
+	{Name: "../../federation/entity.graphql", Input: `
+# a union of all types that use the @key directive
+union _Entity = Order | User
+
+# fake type to build resolver interfaces for users to implement
+type Entity {
+	findOrderByID(id: Int64!,): Order!
+	findUserByID(id: Int64!,): User!
 }
-`, BuiltIn: false},
+
+type _Service {
+  sdl: String
+}
+
+extend type Query {
+  _entities(representations: [_Any!]!): [_Entity]!
+  _service: _Service!
+}
+`, BuiltIn: true},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)

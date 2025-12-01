@@ -10,60 +10,50 @@ import (
 	"genos/gql/graph/generated"
 	modelsGen "genos/gql/graph/models_gen"
 	db "genos/infrastructure/sqlite"
-	models1 "genos/internal/common/models"
 	"genos/modules/orders/repository"
 	"genos/modules/orders/usecase"
 	"time"
 )
 
-// GetOrder is the resolver for the getOrder field.
-func (r *queryResolver) GetOrder(ctx context.Context, id int64) (*modelsGen.ResponseOrder, error) {
+// FindOrderByID is the resolver for the findOrderByID field.
+func (r *entityResolver) FindOrderByID(ctx context.Context, id int64) (*modelsGen.Order, error) {
 	uc := usecase.NewOrderUsecase(db.GetDatabaseConnection(), repository.NewOrderRepository(db.GetDatabaseConnection()))
 	orderData, err := uc.GetOrder(ctx, uint64(id))
 	if err != nil {
 		return nil, err
 	}
-
-	response := &modelsGen.ResponseOrder{
-		Items: func() (order *modelsGen.Order) {
-			if orderData != nil {
-				return &modelsGen.Order{
-					ID:            int64(orderData.ID),
-					UserID:        int64(orderData.UserID),
-					OrderNumber:   orderData.OrderNumber,
-					TotalAmount:   orderData.TotalAmount,
-					PaymentMethod: orderData.PaymentMethod,
-					Status:        orderData.Status,
-					CreatedAt:     orderData.CreatedAt,
-					UpdatedAt:     orderData.UpdatedAt,
-					OrderItems: func() []*modelsGen.OrderItem {
-						items := make([]*modelsGen.OrderItem, len(orderData.OrderItems))
-						for i := range orderData.OrderItems {
-							item := orderData.OrderItems[i]
-							items[i] = &modelsGen.OrderItem{
-								ID:          int64(item.ID),
-								OrderID:     int64(item.OrderID),
-								ProductID:   int64(item.ProductID),
-								ProductName: item.ProductName,
-								Qty:         int(item.Qty),
-								Price:       item.Price,
-							}
-						}
-						return items
-					}(),
+	return &modelsGen.Order{
+		ID:            int64(orderData.ID),
+		UserID:        int64(orderData.UserID),
+		OrderNumber:   orderData.OrderNumber,
+		TotalAmount:   orderData.TotalAmount,
+		PaymentMethod: orderData.PaymentMethod,
+		Status:        orderData.Status,
+		CreatedAt:     orderData.CreatedAt,
+		UpdatedAt:     orderData.UpdatedAt,
+		OrderItems: func() []*modelsGen.OrderItem {
+			items := make([]*modelsGen.OrderItem, len(orderData.OrderItems))
+			for i := range orderData.OrderItems {
+				item := orderData.OrderItems[i]
+				items[i] = &modelsGen.OrderItem{
+					ID:          int64(item.ID),
+					OrderID:     int64(item.OrderID),
+					ProductID:   int64(item.ProductID),
+					ProductName: item.ProductName,
+					Qty:         int(item.Qty),
+					Price:       item.Price,
 				}
 			}
-			return
+			return items
 		}(),
-	}
-
-	return response, nil
+	}, nil
 }
 
-// GetOrderByUserID is the resolver for the getOrderByUserId field.
-func (r *queryResolver) GetOrderByUserID(ctx context.Context, id int64, option *models1.QueryOption) (*modelsGen.ResponseOrderList, error) {
+// FindUserByID is the resolver for the findUserByID field.
+func (r *entityResolver) FindUserByID(ctx context.Context, id int64) (*modelsGen.User, error) {
 	uc := usecase.NewOrderUsecase(db.GetDatabaseConnection(), repository.NewOrderRepository(db.GetDatabaseConnection()))
-	orderList, err := uc.GetOrderByUserID(ctx, uint64(id), option)
+
+	orderList, err := uc.GetOrderByUserID(ctx, uint64(id), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -103,13 +93,13 @@ func (r *queryResolver) GetOrderByUserID(ctx context.Context, id int64, option *
 		orders[i].OrderItems = orderItems
 	}
 
-	response := &modelsGen.ResponseOrderList{
-		Items: orders,
-	}
-	return response, nil
+	return &modelsGen.User{
+		ID:     id,
+		Orders: orders,
+	}, nil
 }
 
-// Query returns generated.QueryResolver implementation.
-func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
+// Entity returns generated.EntityResolver implementation.
+func (r *Resolver) Entity() generated.EntityResolver { return &entityResolver{r} }
 
-type queryResolver struct{ *Resolver }
+type entityResolver struct{ *Resolver }

@@ -3,18 +3,49 @@
 package modelsGen
 
 import (
-	models1 "genos/internal/common/models"
-	"genos/modules/orders/models"
+	"genos/internal/common/models"
+	"time"
 )
+
+type Order struct {
+	ID            int64        `json:"id"`
+	UserID        int64        `json:"user_id"`
+	OrderNumber   string       `json:"order_number"`
+	TotalAmount   float64      `json:"total_amount"`
+	PaymentMethod string       `json:"payment_method"`
+	Status        string       `json:"status"`
+	CreatedAt     time.Time    `json:"created_at"`
+	UpdatedAt     time.Time    `json:"updated_at"`
+	DeletedAt     *time.Time   `json:"deleted_at,omitempty"`
+	OrderItems    []*OrderItem `json:"order_items"`
+}
+
+func (Order) IsEntity() {}
+
+type OrderItem struct {
+	ID          int64   `json:"id"`
+	OrderID     int64   `json:"order_id"`
+	ProductID   int64   `json:"product_id"`
+	ProductName string  `json:"product_name"`
+	Qty         int     `json:"qty"`
+	Price       float64 `json:"price"`
+}
 
 type Query struct {
 }
 
 type ResponseOrder struct {
-	Items *models.Order `json:"items"`
+	Items *Order `json:"items"`
 }
 
 type ResponseOrderList struct {
-	Items      []*models.Order     `json:"items"`
-	Pagination *models1.Pagination `json:"pagination"`
+	Items      []*Order           `json:"items"`
+	Pagination *models.Pagination `json:"pagination"`
 }
+
+type User struct {
+	ID     int64    `json:"id"`
+	Orders []*Order `json:"orders"`
+}
+
+func (User) IsEntity() {}
